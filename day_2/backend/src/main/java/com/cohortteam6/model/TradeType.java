@@ -1,0 +1,25 @@
+package com.cohortteam6.model;
+
+import java.time.LocalDate;
+import java.util.Comparator;
+
+public sealed interface TradeType
+        extends Comparable<TradeType>
+        permits EquityTrade, FXTrade, BondTrade, DerivativeTrade {
+
+    TradeRef tradeRef();
+    Money notional();
+    LocalDate tradeDate();
+    AssetClass assetClass();
+
+    Comparator<TradeType> NATURAL = Comparator
+            .comparing(TradeType::tradeDate).reversed()
+            .thenComparing(t -> t.tradeRef().value());
+
+    @Override
+    default int compareTo(TradeType otherTrade) {
+        return NATURAL.compare(this, otherTrade);
+    }
+
+    enum AssetClass { EQUITY, FX, BOND, DERIVATIVE }
+}
