@@ -1,28 +1,32 @@
+```markdown
+# C4 Container Diagram - ReconX
+
 ```mermaid
 C4Container
-    title C4 Container - ReconX Enterprise Trade Reconciliation Platform
-    
-    Person(user, "User", "Trader / Analyst / Admin")
-    System_Ext(omsKafka, "Internal OMS", "Upstream trade source")
-    System_Ext(ssoIdP, "Corporate SSO", "OIDC IdP")
-    
-    System_Boundary(reconxBoundary, "ReconX") {
-        Container(reactSpa, "Recon UI", "React 19 + Vite", "Single-page app. Live trade feed via SSE; trades + breaks tables; admin views.")
-        Container(api, "recon-service API", "Java 25 + Spring Boot 3", "REST API. JWT auth, RBAC, validation, exposes /actuator/prometheus.")
-        Container(reconEngine, "Reconciliation Engine", "Spring + CompletableFuture", "Async batch + streaming match logic. Writes recon_breaks.")
-        Container(postgres, "PostgreSQL 16", "Liquibase-managed", "Partitioned trades, recon_breaks, audit_log, mat. views.")
-        Container(kafka, "Apache Kafka", "3 topics + DLQs", "trade-events, recon-results, system-alerts. DLQ per topic.")
-        Container(prom, "Prometheus", "TSDB", "Scrapes the API every 15s.")
-        Container(graf, "Grafana", "Dashboard", "Pre-provisioned dashboards.")
-    }
-    
-    Rel(user, reactSpa, "Uses", "HTTPS")
-    Rel(reactSpa, api, "REST + SSE", "HTTPS / JSON")
-    Rel(reactSpa, ssoIdP, "Login (OIDC)", "HTTPS")
-    Rel(api, postgres, "Reads + writes", "JDBC")
-    Rel(api, kafka, "Publishes trade-events", "Kafka protocol")
-    Rel(reconEngine, kafka, "Consumes trade-events", "Kafka protocol")
-    Rel(reconEngine, postgres, "Writes recon_breaks", "JDBC")
-    Rel(omsKafka, kafka, "Streams trades", "Kafka MirrorMaker")
-    Rel(prom, api, "Scrapes /actuator/prometheus", "HTTPS")
-    Rel(graf, prom, "Queries metrics", "HTTPS / PromQL")
+  title C4 Container — ReconX (Level 2)
+
+  System_Boundary(reconxBoundary, "ReconX") {
+    Container(spa, "React SPA", "React + Vite", "User interface")
+    Container(api, "API Service", "Spring Boot", "REST API with SSE")
+    Container(engine, "Recon Engine", "Java", "Reconciliation processing")
+    ContainerDb(db, "Postgres", "PostgreSQL 15", "Main database")
+    ContainerQueue(kafka, "Kafka", "Apache Kafka", "Event streaming")
+    Container(prometheus, "Prometheus", "Prometheus", "Metrics collection")
+    Container(grafana, "Grafana", "Grafana", "Dashboard and monitoring")
+  }
+
+  System_Ext(user, "User", "Human actor")
+  System_Ext(oms, "OMS", "Order Management")
+  System_Ext(sso, "SSO", "Authentication")
+
+  Rel(user, spa, "Uses", "HTTPS")
+  Rel(spa, api, "REST + SSE", "HTTPS/JSON")
+  Rel(api, engine, "Calls", "gRPC")
+  Rel(api, db, "Reads/Writes", "JDBC")
+  Rel(api, kafka, "Publishes", "Kafka")
+  Rel(engine, kafka, "Consumes", "Kafka")
+  Rel(api, oms, "Fetches trades", "HTTPS")
+  Rel(api, sso, "Validates", "OIDC")
+  Rel(engine, db, "Updates", "JDBC")
+  Rel(prometheus, db, "Scrapes", "PostgreSQL exporter")
+  Rel(grafana, prometheus, "Queries", "PromQL")

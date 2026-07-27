@@ -1,28 +1,31 @@
+# C4 Context Diagram - ReconX
+
+```mermaid
 C4Context
-    title C4 Context - ReconX Enterprise Trade Reconciliation Platform
-    
-    Person(traderUser, "Trader User", "Books and amends trades; investigates breaks.")
-    Person(reconAnalyst, "Recon Analyst", "Resolves daily reconciliation breaks.")
-    Person(opsAdmin, "Ops Admin", "Manages users, audits activity.")
-    Person(complianceUser, "Compliance Officer", "Reads audit log + reports only.")
-    
-    System(reconx, "ReconX", "Internal trade reconciliation platform. Auto-matches internal vs external trade records, surfaces breaks, tracks resolution SLAs.")
-    
-    System_Ext(omsKafka, "Internal OMS", "Upstream trade source. Streams internal trade records (intra-day Kafka feed).")
-    System_Ext(counterpartySFTP, "Counterparty SFTP", "Counterparty Trade Files. EOD CSV feeds from custodian/counterparties via SFTP.")
-    System_Ext(bloombergPricing, "Bloomberg Pricing", "Reference market data for break investigation.")
-    System_Ext(emailGateway, "Email Gateway", "Corporate Email. Sends break-resolution notifications to Ops.")
-    System_Ext(ssoIdP, "Corporate SSO", "OIDC IdP. Issues JWT after OIDC login.")
-    System_Ext(grafana, "Grafana / Prometheus", "Scrapes metrics for SRE dashboards and alerts.")
-    
-    Rel(traderUser, reconx, "Books trades, views breaks", "HTTPS")
-    Rel(reconAnalyst, reconx, "Resolves breaks", "HTTPS")
-    Rel(opsAdmin, reconx, "User admin, audit", "HTTPS")
-    Rel(complianceUser, reconx, "Reads audit log + reports only.", "HTTPS, read-only")
-    
-    Rel(reconx, omsKafka, "Streams trades", "Kafka topic: trade-events")
-    Rel(reconx, counterpartySFTP, "Drops EOD trade CSVs", "SFTP poll, 5-min interval")
-    Rel(reconx, bloombergPricing, "Fetches reference prices", "HTTPS, REST")
-    Rel(reconx, emailGateway, "Sends break notifications", "SMTP")
-    Rel(reconx, ssoIdP, "Validates user", "OIDC, HTTPS")
-    Rel(reconx, grafana, "Scrapes actuator/prometheus", "HTTPS")
+  title C4 Context — ReconX (Level 1)
+
+  Person(trader, "Trader", "Executes trades and monitors positions")
+  Person(analyst, "Recon Analyst", "Investigates breaks and runs reconciliations")
+  Person(ops, "Ops Admin", "Configures jobs and monitors system health")
+  Person(compliance, "Compliance", "Reviews audit trails and reports")
+
+  System(reconx, "ReconX", "Automated trade reconciliation system")
+
+  System_Ext(oms, "OMS", "Order Management System")
+  System_Ext(sftp, "SFTP", "File transfer for trade files")
+  System_Ext(bloomberg, "Bloomberg", "Market data provider")
+  System_Ext(email, "Email", "Notification service")
+  System_Ext(sso, "SSO", "Authentication provider")
+  System_Ext(grafana, "Grafana", "Monitoring and dashboards")
+
+  Rel(trader, reconx, "Submits trades", "HTTPS")
+  Rel(analyst, reconx, "Runs reports and investigates", "HTTPS")
+  Rel(ops, reconx, "Monitors and configures", "HTTPS")
+  Rel(compliance, reconx, "Reviews audit logs", "HTTPS")
+
+  Rel(reconx, oms, "Fetches trades", "REST/HTTPS")
+  Rel(reconx, sftp, "Exports/Imports files", "SFTP")
+  Rel(reconx, bloomberg, "Gets market prices", "API/HTTPS")
+  Rel(reconx, email, "Sends notifications", "SMTP")
+  Rel(reconx, sso, "Validates identities", "OIDC")
+  Rel(reconx, grafana, "Exports metrics", "Prometheus")
