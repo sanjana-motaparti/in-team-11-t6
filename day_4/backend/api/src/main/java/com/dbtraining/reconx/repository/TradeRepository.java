@@ -4,6 +4,7 @@ import com.dbtraining.reconx.domain.Trade;
 import com.dbtraining.reconx.domain.TradeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +30,13 @@ public interface TradeRepository
       @Param("status") TradeStatus status,
       @Param("counterpartyId") Long counterpartyId,
       Pageable pageable);
+
+  default Page<Trade> findBySpecification(LocalDate from, LocalDate to, TradeStatus status, Long counterpartyId,
+      Pageable pageable) {
+    Specification<Trade> spec = Specification.where(TradeSpecification.tradeDateBetween(from, to))
+        .and(TradeSpecification.hasStatus(status))
+        .and(TradeSpecification.forCounterparty(counterpartyId));
+    return findAll(spec, pageable);
+  }
+
 }
