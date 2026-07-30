@@ -19,3 +19,4 @@ logging:
   level:
     com.dbtraining.reconx: DEBUG
     org.hibernate.SQL: DEBUG
+
