@@ -17,32 +17,27 @@ import java.util.UUID;
 @Order(1)
 public class MdcFilter implements Filter {
 
-  private static final String HDR_CORRELATION = "X-Correlation-Id";
-  private static final String HDR_TRADE_REF = "X-Trade-Ref";
+  private static final String CORRELATION_ID = "correlationId";
+  private static final String TRADE_REF = "tradeRef";
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
+    String correlationId = httpRequest.getHeader("X-Correlation-Id");
+    if (correlationId == null || correlationId.isBlank()) {
+      correlationId = UUID.randomUUID().toString();
+    }
+
+    String tradeRef = httpRequest.getParameter("tradeRef");
 
     try {
-      // Step 4: Read X-Correlation-Id header, default to UUID if not present
-      String correlationId = httpRequest.getHeader(HDR_CORRELATION);
-      if (correlationId == null || correlationId.isBlank()) {
-        correlationId = UUID.randomUUID().toString();
+      MDC.put(CORRELATION_ID, correlationId);
+      if (tradeRef != null) {
+        MDC.put(TRADE_REF, tradeRef);
       }
-      MDC.put("correlationId", correlationId);
-
-      // Step 5: Read X-Trade-Ref header (may be null, only MDC.put if non-null)
-      String tradeRef = httpRequest.getHeader(HDR_TRADE_REF);
-      if (tradeRef != null && !tradeRef.isBlank()) {
-        MDC.put("tradeRef", tradeRef);
-      }
-
-      // Step 6: Wrap chain.doFilter in try/finally; call MDC.clear() in the finally
       chain.doFilter(request, response);
-
     } finally {
       MDC.clear();
     }
