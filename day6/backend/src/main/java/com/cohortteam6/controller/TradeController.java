@@ -23,13 +23,9 @@ import java.time.LocalDate;
 import java.util.Map;
 
 /**
- * ============================================================================
- * TICKET-ADV063-ADV067 — TradeController (full CRUD + filterable list)
- * TICKET-ADV080 — API versioning: every endpoint under /v1/
  *
  * Combined with the /api context-path from application.yml, full URLs are
  * /api/v1/trades, /api/v1/trades/{id} etc.
- * ============================================================================
  */
 @RestController
 @RequestMapping("/v1/trades")

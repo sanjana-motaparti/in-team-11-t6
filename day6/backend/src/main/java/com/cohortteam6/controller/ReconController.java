@@ -17,11 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * TICKET-ADV068 — POST /api/v1/recon/run — returns 202 + jobId
- * TICKET-ADV069 — GET  /api/v1/recon/jobs/{jobId}/results
- * TICKET-ADV070 — PUT  /api/v1/recon/results/{id}/resolve
- */
+
 @RestController
 @RequestMapping("/v1/recon")
 @Tag(name = "recon", description = "Reconciliation operations")
@@ -54,7 +50,5 @@ public class ReconController {
                 .orElseThrow(() -> new TradeNotFoundException(id.toString()));
         rb.resolve(body.get("note"));
         return ResponseEntity.ok(breaks.save(rb));
-    }
-}
     }
 }
