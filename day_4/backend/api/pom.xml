@@ -21,7 +21,8 @@
     <dependencies>
         <dependency>
             <groupId>com.dbtraining.reconx</groupId>
-            <artifactId>reconx-service</artifactId>
+            <artifactId>reconx-domain</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
