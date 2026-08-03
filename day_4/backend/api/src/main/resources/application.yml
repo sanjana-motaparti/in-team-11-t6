@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: reconx-api
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.actuate.autoconfigure.endpoint.web.ServletEndpointDiscoverer
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.dbtraining.reconx: DEBUG
